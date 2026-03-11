@@ -1,52 +1,22 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>My RecRoom Style VR</title>
-
-<script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-<script src="https://unpkg.com/super-hands@4.0.2/dist/super-hands.min.js"></script>
-
+<meta charset="UTF-8">
+<title>Portal HTML Demo</title>
+<link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<a-scene background="color: #87CEEB">
+<canvas id="game"></canvas>
 
-<!-- FLOOR -->
-<a-plane rotation="-90 0 0" width="40" height="40" color="#eeeeee"></a-plane>
+<div id="ui">
+Click = Blue Portal |
+Right Click = Orange Portal |
+WASD = Move
+</div>
 
-<!-- WALLS -->
-<a-box position="0 3 -10" width="20" height="6" depth="1" color="#ffffff"></a-box>
-<a-box position="-10 3 0" width="1" height="6" depth="20" color="#ffffff"></a-box>
-<a-box position="10 3 0" width="1" height="6" depth="20" color="#ffffff"></a-box>
-
-<!-- GRABBABLE OBJECTS -->
-<a-box position="0 1 -3" color="#ff4444" class="grabbable"></a-box>
-<a-box position="1 1 -3" color="#44ff44" class="grabbable"></a-box>
-<a-box position="-1 1 -3" color="#4444ff" class="grabbable"></a-box>
-
-<!-- PLAYER -->
-<a-entity id="rig" position="0 1.6 0">
-
-<a-camera></a-camera>
-
-<!-- LEFT HAND -->
-<a-entity
-hand-controls="hand: left"
-super-hands
-raycaster="objects: .grabbable">
-</a-entity>
-
-<!-- RIGHT HAND -->
-<a-entity
-hand-controls="hand: right"
-super-hands
-raycaster="objects: .grabbable">
-</a-entity>
-
-</a-entity>
-
-</a-scene>
+<script src="game.js"></script>
 
 </body>
 </html>
