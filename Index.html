@@ -4,33 +4,50 @@
 <meta charset="utf-8">
 
 <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+
 <script src="https://cdn.jsdelivr.net/npm/aframe-physics-system@4.2.2/dist/aframe-physics-system.min.js"></script>
+
+<script src="https://unpkg.com/super-hands@4.0.3/dist/super-hands.min.js"></script>
 
 </head>
 
 <body>
 
-<a-scene physics="gravity: -9.8">
+<a-scene physics="driver: ammo; gravity: -9.8">
 
 <a-sky color="#88c"></a-sky>
 
-<!-- floor -->
-<a-plane rotation="-90 0 0"
-width="50"
-height="50"
+<!-- FLOOR -->
+<a-box
+position="0 -0.5 0"
+width="40"
+height="1"
+depth="40"
 color="#7BC8A4"
 static-body>
-</a-plane>
+</a-box>
 
-<!-- falling cubes -->
-<a-box position="0 6 -4" color="red" dynamic-body></a-box>
-<a-box position="1 8 -4" color="blue" dynamic-body></a-box>
-<a-box position="-1 10 -4" color="yellow" dynamic-body></a-box>
+<!-- FALLING CUBES -->
+<a-box position="0 5 -3" color="red" dynamic-body grabbable></a-box>
+<a-box position="1 7 -3" color="blue" dynamic-body grabbable></a-box>
+<a-box position="-1 9 -3" color="yellow" dynamic-body grabbable></a-box>
 
-<!-- player -->
-<a-entity position="0 1.6 0">
+<!-- PLAYER RIG -->
+<a-entity id="rig" position="0 1.6 0">
 
-<a-camera wasd-controls look-controls></a-camera>
+<a-camera></a-camera>
+
+<!-- LEFT HAND -->
+<a-entity
+hand-controls="hand: left"
+super-hands>
+</a-entity>
+
+<!-- RIGHT HAND -->
+<a-entity
+hand-controls="hand: right"
+super-hands>
+</a-entity>
 
 </a-entity>
 
