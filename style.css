@@ -1,20 +1,15 @@
 body{
 margin:0;
 overflow:hidden;
-background:#111;
+background:black;
 font-family:arial;
-color:white;
 }
 
-#ui{
+#info{
 position:absolute;
 top:10px;
 left:10px;
+color:white;
 background:rgba(0,0,0,0.5);
-padding:8px;
-border-radius:6px;
-}
-
-canvas{
-display:block;
+padding:6px;
 }
