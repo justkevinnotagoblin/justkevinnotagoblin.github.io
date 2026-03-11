@@ -1,120 +1,119 @@
-const canvas = document.getElementById("game")
-const ctx = canvas.getContext("2d")
+let scene = new THREE.Scene()
 
-canvas.width = window.innerWidth
-canvas.height = window.innerHeight
+let camera = new THREE.PerspectiveCamera(
+75,
+window.innerWidth/window.innerHeight,
+0.1,
+1000
+)
 
-let player = {
-x:200,
-y:200,
-size:20,
-speed:3
+let renderer = new THREE.WebGLRenderer()
+renderer.setSize(window.innerWidth,window.innerHeight)
+document.body.appendChild(renderer.domElement)
+
+camera.position.set(0,1.6,5)
+
+let light = new THREE.PointLight(0xffffff,1)
+light.position.set(0,5,0)
+scene.add(light)
+
+let floorGeo = new THREE.BoxGeometry(20,1,20)
+let floorMat = new THREE.MeshStandardMaterial({color:0x888888})
+let floor = new THREE.Mesh(floorGeo,floorMat)
+floor.position.y=-1
+scene.add(floor)
+
+let wallMat = new THREE.MeshStandardMaterial({color:0xffffff})
+
+function wall(x,y,z,w,h,d){
+let g=new THREE.BoxGeometry(w,h,d)
+let m=new THREE.Mesh(g,wallMat)
+m.position.set(x,y,z)
+scene.add(m)
 }
 
-let keys = {}
+wall(0,2,-10,20,5,1)
+wall(-10,2,0,1,5,20)
+wall(10,2,0,1,5,20)
 
-let bluePortal = null
-let orangePortal = null
+let bluePortal=null
+let orangePortal=null
 
-let walls = [
-{x:300,y:200,w:200,h:20},
-{x:500,y:350,w:20,h:200},
-{x:150,y:450,w:250,h:20}
-]
+function createPortal(color){
+let g=new THREE.CircleGeometry(1,32)
+let m=new THREE.MeshBasicMaterial({color:color})
+let p=new THREE.Mesh(g,m)
+return p
+}
+
+document.addEventListener("mousedown",e=>{
+
+let dir=new THREE.Vector3()
+camera.getWorldDirection(dir)
+
+let pos=camera.position.clone().add(dir.multiplyScalar(5))
+
+if(e.button===0){
+
+if(bluePortal) scene.remove(bluePortal)
+
+bluePortal=createPortal(0x00aaff)
+bluePortal.position.copy(pos)
+scene.add(bluePortal)
+
+}
+
+if(e.button===2){
+
+if(orangePortal) scene.remove(orangePortal)
+
+orangePortal=createPortal(0xff8800)
+orangePortal.position.copy(pos)
+scene.add(orangePortal)
+
+}
+
+})
+
+let keys={}
 
 document.addEventListener("keydown",e=>keys[e.key]=true)
 document.addEventListener("keyup",e=>keys[e.key]=false)
 
-canvas.addEventListener("click",e=>{
-bluePortal = {x:e.clientX,y:e.clientY}
-})
+function move(){
 
-canvas.addEventListener("contextmenu",e=>{
-e.preventDefault()
-orangePortal = {x:e.clientX,y:e.clientY}
-})
+let speed=0.08
 
-function movePlayer(){
-
-if(keys["w"]) player.y -= player.speed
-if(keys["s"]) player.y += player.speed
-if(keys["a"]) player.x -= player.speed
-if(keys["d"]) player.x += player.speed
+if(keys["w"]) camera.position.z-=speed
+if(keys["s"]) camera.position.z+=speed
+if(keys["a"]) camera.position.x-=speed
+if(keys["d"]) camera.position.x+=speed
 
 }
 
-function portalTeleport(){
+function portalCheck(){
 
 if(!bluePortal || !orangePortal) return
 
-let dx = player.x-bluePortal.x
-let dy = player.y-bluePortal.y
+let d1=camera.position.distanceTo(bluePortal.position)
+let d2=camera.position.distanceTo(orangePortal.position)
 
-if(Math.sqrt(dx*dx+dy*dy) < 20){
-player.x = orangePortal.x
-player.y = orangePortal.y
+if(d1<1){
+camera.position.copy(orangePortal.position)
 }
 
-dx = player.x-orangePortal.x
-dy = player.y-orangePortal.y
-
-if(Math.sqrt(dx*dx+dy*dy) < 20){
-player.x = bluePortal.x
-player.y = bluePortal.y
+if(d2<1){
+camera.position.copy(bluePortal.position)
 }
-
-}
-
-function drawWalls(){
-
-ctx.fillStyle="white"
-
-for(let w of walls){
-ctx.fillRect(w.x,w.y,w.w,w.h)
-}
-
-}
-
-function drawPortals(){
-
-if(bluePortal){
-ctx.fillStyle="blue"
-ctx.beginPath()
-ctx.arc(bluePortal.x,bluePortal.y,15,0,Math.PI*2)
-ctx.fill()
-}
-
-if(orangePortal){
-ctx.fillStyle="orange"
-ctx.beginPath()
-ctx.arc(orangePortal.x,orangePortal.y,15,0,Math.PI*2)
-ctx.fill()
-}
-
-}
-
-function drawPlayer(){
-
-ctx.fillStyle="red"
-ctx.fillRect(
-player.x-player.size/2,
-player.y-player.size/2,
-player.size,
-player.size
-)
 
 }
 
 function loop(){
 
-ctx.clearRect(0,0,canvas.width,canvas.height)
+move()
+portalCheck()
 
-movePlayer()
-portalTeleport()
-
-drawWalls()
-drawPortals()
-drawPlayer()
+renderer.render(scene,camera)
 
 requestAnimationFrame(loop)
 
