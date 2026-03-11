@@ -1,15 +1,9 @@
-body{
-margin:0;
-overflow:hidden;
-background:black;
-font-family:arial;
+body {
+    margin: 0;
+    overflow: hidden;
+    background: black;
 }
 
-#info{
-position:absolute;
-top:10px;
-left:10px;
-color:white;
-background:rgba(0,0,0,0.5);
-padding:6px;
+canvas {
+    display: block;
 }
