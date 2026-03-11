@@ -1,122 +1,75 @@
-let scene = new THREE.Scene()
+import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js";
+import { PointerLockControls } from "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/PointerLockControls.js";
 
-let camera = new THREE.PerspectiveCamera(
-75,
-window.innerWidth/window.innerHeight,
-0.1,
-1000
-)
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x202020);
 
-let renderer = new THREE.WebGLRenderer()
-renderer.setSize(window.innerWidth,window.innerHeight)
-document.body.appendChild(renderer.domElement)
+const camera = new THREE.PerspectiveCamera(
+    75,
+    window.innerWidth / window.innerHeight,
+    0.1,
+    1000
+);
 
-camera.position.set(0,1.6,5)
+const renderer = new THREE.WebGLRenderer({ canvas: document.querySelector("#game") });
+renderer.setSize(window.innerWidth, window.innerHeight);
 
-let light = new THREE.PointLight(0xffffff,1)
-light.position.set(0,5,0)
-scene.add(light)
+const light = new THREE.HemisphereLight(0xffffff, 0x444444);
+scene.add(light);
 
-let floorGeo = new THREE.BoxGeometry(20,1,20)
-let floorMat = new THREE.MeshStandardMaterial({color:0x888888})
-let floor = new THREE.Mesh(floorGeo,floorMat)
-floor.position.y=-1
-scene.add(floor)
+camera.position.y = 1.6;
 
-let wallMat = new THREE.MeshStandardMaterial({color:0xffffff})
+// floor
+const floor = new THREE.Mesh(
+    new THREE.PlaneGeometry(50, 50),
+    new THREE.MeshStandardMaterial({ color: 0x555555 })
+);
+floor.rotation.x = -Math.PI / 2;
+scene.add(floor);
 
-function wall(x,y,z,w,h,d){
-let g=new THREE.BoxGeometry(w,h,d)
-let m=new THREE.Mesh(g,wallMat)
-m.position.set(x,y,z)
-scene.add(m)
+// grabpack hand
+const hand = new THREE.Mesh(
+    new THREE.BoxGeometry(0.2, 0.2, 0.2),
+    new THREE.MeshStandardMaterial({ color: 0x00aaff })
+);
+
+scene.add(hand);
+hand.visible = false;
+
+let shooting = false;
+let distance = 0;
+
+document.addEventListener("click", () => {
+    controls.lock();
+});
+
+// shoot grabpack
+document.addEventListener("mousedown", () => {
+    shooting = true;
+    distance = 0;
+    hand.visible = true;
+});
+
+// pointer lock
+const controls = new PointerLockControls(camera, document.body);
+scene.add(controls.getObject());
+
+function animate() {
+    requestAnimationFrame(animate);
+
+    if (shooting) {
+        distance += 0.2;
+
+        hand.position.copy(camera.position);
+        hand.translateZ(-distance);
+
+        if (distance > 10) {
+            shooting = false;
+            hand.visible = false;
+        }
+    }
+
+    renderer.render(scene, camera);
 }
 
-wall(0,2,-10,20,5,1)
-wall(-10,2,0,1,5,20)
-wall(10,2,0,1,5,20)
-
-let bluePortal=null
-let orangePortal=null
-
-function createPortal(color){
-let g=new THREE.CircleGeometry(1,32)
-let m=new THREE.MeshBasicMaterial({color:color})
-let p=new THREE.Mesh(g,m)
-return p
-}
-
-document.addEventListener("mousedown",e=>{
-
-let dir=new THREE.Vector3()
-camera.getWorldDirection(dir)
-
-let pos=camera.position.clone().add(dir.multiplyScalar(5))
-
-if(e.button===0){
-
-if(bluePortal) scene.remove(bluePortal)
-
-bluePortal=createPortal(0x00aaff)
-bluePortal.position.copy(pos)
-scene.add(bluePortal)
-
-}
-
-if(e.button===2){
-
-if(orangePortal) scene.remove(orangePortal)
-
-orangePortal=createPortal(0xff8800)
-orangePortal.position.copy(pos)
-scene.add(orangePortal)
-
-}
-
-})
-
-let keys={}
-
-document.addEventListener("keydown",e=>keys[e.key]=true)
-document.addEventListener("keyup",e=>keys[e.key]=false)
-
-function move(){
-
-let speed=0.08
-
-if(keys["w"]) camera.position.z-=speed
-if(keys["s"]) camera.position.z+=speed
-if(keys["a"]) camera.position.x-=speed
-if(keys["d"]) camera.position.x+=speed
-
-}
-
-function portalCheck(){
-
-if(!bluePortal || !orangePortal) return
-
-let d1=camera.position.distanceTo(bluePortal.position)
-let d2=camera.position.distanceTo(orangePortal.position)
-
-if(d1<1){
-camera.position.copy(orangePortal.position)
-}
-
-if(d2<1){
-camera.position.copy(bluePortal.position)
-}
-
-}
-
-function loop(){
-
-move()
-portalCheck()
-
-renderer.render(scene,camera)
-
-requestAnimationFrame(loop)
-
-}
-
-loop()
+animate();
