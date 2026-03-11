@@ -1,57 +1,31 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="utf-8">
-
-<script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
-
-<script src="https://cdn.jsdelivr.net/npm/aframe-physics-system@4.2.2/dist/aframe-physics-system.min.js"></script>
-
-<script src="https://unpkg.com/super-hands@4.0.3/dist/super-hands.min.js"></script>
-
+<title>My VR Game</title>
+<script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
 </head>
 
 <body>
-
-<a-scene physics="driver: ammo; gravity: -9.8">
+<a-scene>
 
 <a-sky color="#88c"></a-sky>
 
-<!-- FLOOR -->
-<a-box
-position="0 -0.5 0"
-width="40"
-height="1"
-depth="40"
-color="#7BC8A4"
-static-body>
-</a-box>
+<a-plane rotation="-90 0 0" width="30" height="30" color="#7BC8A4"></a-plane>
 
-<!-- FALLING CUBES -->
-<a-box position="0 5 -3" color="red" dynamic-body grabbable></a-box>
-<a-box position="1 7 -3" color="blue" dynamic-body grabbable></a-box>
-<a-box position="-1 9 -3" color="yellow" dynamic-body grabbable></a-box>
+<a-box position="0 1 -3" color="red" dynamic-body></a-box>
+<a-box position="1 3 -3" color="blue" dynamic-body></a-box>
+<a-box position="-1 5 -3" color="green" dynamic-body></a-box>
 
-<!-- PLAYER RIG -->
+<!-- Player -->
 <a-entity id="rig" position="0 1.6 0">
-
+    
 <a-camera></a-camera>
 
-<!-- LEFT HAND -->
-<a-entity
-hand-controls="hand: left"
-super-hands>
-</a-entity>
-
-<!-- RIGHT HAND -->
-<a-entity
-hand-controls="hand: right"
-super-hands>
-</a-entity>
+<a-entity laser-controls="hand: left"></a-entity>
+<a-entity laser-controls="hand: right"></a-entity>
 
 </a-entity>
 
 </a-scene>
-
 </body>
 </html>
